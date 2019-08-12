@@ -3,12 +3,15 @@ require 'json'
 
 class GamesController < ApplicationController
   def new
-    @letters = [*('A'..'Z')].sample(10)
+    session[:score] = 0 if session[:score].nil?
+    @letters = ('A'..'Z').to_a.sample(10)
   end
 
   def score
     # raise
     run_game(params[:word], params[:grid].chars)
+    @score = session[:score]
+    # return @score
   end
 
   def checking_grid(attempt, grid)
@@ -26,11 +29,13 @@ class GamesController < ApplicationController
 
     if words["found"] && checking_grid(attempt, grid)
       @word = "Congratulations! #{params[:word].upcase} is a valid English word!"
+      session[:score] += params[:word].length
     elsif words["found"] && !checking_grid(attempt, grid)
       @word = "Sorry but #{params[:word].upcase} can't be built out of #{params[:grid]}"
+      session[:score] += 0
     else
       @word = "Sorry but #{params[:word].upcase} does not seem to be a valid English word..."
+      session[:score] += 0
     end
   end
-
 end
